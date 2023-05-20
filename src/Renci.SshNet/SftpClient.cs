@@ -2086,7 +2086,7 @@ namespace Renci.SshNet
                 #region Existing Files at The Destination
 
                 var destFiles = InternalListDirectory(destinationPath, null);
-                var destDict = new Dictionary<string, ISftpFile>();
+                var destDict = new Dictionary<string, SftpFile>();
                 foreach (var destFile in destFiles)
                 {
                     if (destFile.IsDirectory)
@@ -2152,16 +2152,16 @@ namespace Renci.SshNet
         #endregion
 
         /// <summary>
-        /// Internals the list directory.
+        /// Returns the list of files in the specified path.
         /// </summary>
         /// <param name="path">The path.</param>
         /// <param name="listCallback">The list callback.</param>
         /// <returns>
-        /// A list of files in the specfied directory.
+        /// A list of files in the specified directory.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="path" /> is <b>null</b>.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="path" /> is <see langword="null"/>.</exception>
         /// <exception cref="SshConnectionException">Client not connected.</exception>
-        private IEnumerable<ISftpFile> InternalListDirectory(string path, Action<int> listCallback)
+        private List<SftpFile> InternalListDirectory(string path, Action<int> listCallback)
         {
             if (path == null)
                 throw new ArgumentNullException("path");
@@ -2176,9 +2176,11 @@ namespace Renci.SshNet
             var basePath = fullPath;
 
             if (!basePath.EndsWith("/"))
+            {
                 basePath = string.Format("{0}/", fullPath);
+            }
 
-            var result = new List<ISftpFile>();
+            var result = new List<SftpFile>();
 
             var files = _sftpSession.RequestReadDir(handle);
 
@@ -2238,11 +2240,15 @@ namespace Renci.SshNet
                 {
                     //  Cancel download
                     if (asyncResult != null && asyncResult.IsDownloadCanceled)
+                    {
                         break;
+                    }
 
                     var data = fileReader.Read();
                     if (data.Length == 0)
+                    {
                         break;
+                    }
 
                     output.Write(data, 0, data.Length);
 
