@@ -251,6 +251,8 @@ namespace Renci.SshNet
                 case 3:
                     break;
                 case WaitHandle.WaitTimeout:
+                    BugDemo.DebugWrite("SubsystemSession.WaitOnHandle - Throwing timeout exception...");
+                    BugDemo.DebugBreak();
                     throw new SshOperationTimeoutException("Operation has timed out.");
                 default:
                     throw new NotImplementedException(string.Format(CultureInfo.InvariantCulture, "WaitAny return value '{0}' is not implemented.", result));

@@ -1200,8 +1200,12 @@ namespace Renci.SshNet
             // avoid reading from socket while IsSocketConnected is attempting to determine whether the
             // socket is still connected by invoking Socket.Poll(...) and subsequently verifying value of
             // Socket.Available
+            BugDemo.DebugWrite("Session.ReceiveMessage - Getting lock...");
             lock (_socketReadLock)
             {
+                BugDemo.DebugWrite("Session.ReceiveMessage - Got lock.");
+                BugDemo.DebugBreak();
+
                 // Read first block - which starts with the packet length
                 var firstBlock = new byte[blockSize];
                 if (TrySocketRead(socket, firstBlock, 0, blockSize) == 0)
@@ -1789,8 +1793,11 @@ namespace Renci.SshNet
                     return false;
                 }
 
+                BugDemo.DebugWrite("Session.IsSocketConnected - Getting lock...");
+                BugDemo.DebugBreak();
                 lock (_socketReadLock)
                 {
+                    BugDemo.DebugWrite("Session.IsSocketConnected - Got lock.");
                     var connectionClosedOrDataAvailable = _socket.Poll(0, SelectMode.SelectRead);
                     return !(connectionClosedOrDataAvailable && _socket.Available == 0);
                 }

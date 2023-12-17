@@ -290,11 +290,24 @@ namespace Renci.SshNet.Abstractions
 
             socket.ReceiveTimeout = (int) readTimeout.TotalMilliseconds;
 
+            // BUGDEMO: Uncomment the following line to use a finite timeout instead of an infinite timeout.
+            ////socket.ReceiveTimeout = 5000;
+
+            // BUGDEMO: Consume all the bytes to simulate a hang on the subsequent socket.Receive calls.
+            if (BugDemo.Flag)
+            {
+                var bigN = 1000000;
+                var bytes = new byte[bigN];
+                _ = socket.Receive(bytes, 0, bigN, SocketFlags.None);
+            }
+
             do
             {
                 try
                 {
+                    BugDemo.DebugWrite("SocketAbstraction.Read - Receiving from socket...");
                     var bytesRead = socket.Receive(buffer, offset + totalBytesRead, totalBytesToRead - totalBytesRead, SocketFlags.None);
+                    BugDemo.DebugWrite("SocketAbstraction.Read - Received from socket.");
                     if (bytesRead == 0)
                     {
                         return 0;
